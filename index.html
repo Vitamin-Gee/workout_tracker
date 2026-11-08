@@ -69,7 +69,7 @@ return`<div class="set ${s.done?'done':''}"><button class="ty ${s.t}" onclick="c
 function up(i,j,k,v){S.active.items[i].sets[j][k]=k=='band'?v:(v===''?'':+v);save()}
 function cyc(i,j){const s=S.active.items[i].sets[j];s.t={N:'W',W:'D',D:'F',F:'N'}[s.t];render()}
 function dn(i,j){const s=S.active.items[i].sets[j];s.done=!s.done;if(s.done)rest=Date.now()+S.rest*1000;render()}
-function startR(i){const r=S.routines[i];S.active={name:r.name,start:Date.now(),items:r.items.map(x=>({ex:x.ex,ss:x.ss,sets:x.sets.map(s=>({t:s.t}))}))};render()}
+function startR(i){if(S.active&&!confirm('A workout is already in progress. Replace it?'))return;tab='workout';re=null;picking=0;const r=S.routines[i];S.active={name:r.name,start:Date.now(),items:r.items.map(x=>({ex:x.ex,ss:x.ss,sets:x.sets.map(s=>({t:s.t}))}))};render()}
 function saveR(){const a=S.active;if(!a.items.length)return alert('Add an exercise first.');const n=prompt('Routine name',a.name);if(!n)return;S.routines.push({name:n,items:a.items.map(x=>({ex:x.ex,ss:x.ss,sets:x.sets.map(s=>({t:s.t}))}))});save();alert('Routine saved.')}
 function fin(){const a=S.active,items=a.items.map(x=>({...x,sets:x.sets.filter(s=>s.done)})).filter(x=>x.sets.length);
 if(!items.length){if(!confirm('No completed sets. Discard workout?'))return}else{S.workouts.unshift({id:Date.now(),name:a.name,start:a.start,end:Date.now(),items});alert('Workout complete: '+fmt((Date.now()-a.start)/1000))}S.active=null;rest=0;render()}
