@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d1117"><title>Lift</title>
+<style>
+:root{--bg:#0d1117;--card:#161c25;--line:#252e3a;--tx:#eef2f6;--mu:#8793a1;--ac:#2f80ff;--ok:#27c26a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px -apple-system,system-ui,sans-serif;padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom))}
+#v{padding:12px 14px;max-width:640px;margin:auto}
+h1{font-size:26px;margin:10px 0 14px}h2{font-size:15px;color:var(--mu);margin:18px 0 8px;font-weight:600}
+.card{background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px}
+.ss{border-left:4px solid var(--ac)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mu{color:var(--mu);font-size:13px;margin-top:2px}
+button{font:inherit;color:var(--tx);background:var(--ac);border:0;border-radius:10px;padding:9px 14px}
+button.g{background:#222b37;padding:6px 10px;font-size:14px}button.big{width:100%;padding:14px;margin:8px 0;font-weight:600}
+button.red{background:#4a1f26}
+input,select{font:inherit;color:var(--tx);background:#222b37;border:0;border-radius:8px;padding:8px;min-width:0}
+.search{width:100%;margin-bottom:10px;padding:12px}.note{width:100%;margin:6px 0;font-size:14px}
+.set{display:flex;gap:6px;align-items:center;margin:6px 0;padding:4px;border-radius:10px}
+.set.done{background:#12301f}.set input{width:58px;text-align:center}.set select{width:72px;padding:8px 2px}
+.ty{width:34px;padding:8px 0;background:#222b37;text-align:center}.ty.W{color:#f5a524}.ty.D{color:#a78bfa}.ty.F{color:#ff5d6c}
+.pv{flex:1;color:var(--mu);font-size:13px;text-align:center;min-width:36px}.ck{width:38px;padding:8px 0;background:#222b37}.done .ck{background:var(--ok)}
+.chip{display:inline-block;padding:7px 12px;margin:0 6px 6px 0;border-radius:20px;background:#222b37;font-size:14px}.chip.on{background:var(--ac)}
+.rest{display:none;position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));background:var(--ac);padding:10px 16px;justify-content:space-between;align-items:center}
+.rest button{background:#0004;padding:6px 12px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#10151c;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;color:var(--mu);border-radius:0;padding:14px 0;font-size:14px}nav button.on{color:var(--ac)}
+</style></head><body>
+<div id="v"></div>
+<div id="rest" class="rest"><b></b><button onclick="rest=0">Skip</button></div>
+<nav><button data-t="history" onclick="T('history')">History</button><button data-t="workout" onclick="T('workout')">Workout</button><button data-t="exercises" onclick="T('exercises')">Exercises</button><button data-t="profile" onclick="T('profile')">Profile</button></nav>
+<script>
+const K='lift-v1',BANDS=['orange','pink','blue','green','black','purple'],
+MU=['Chest','Lats','Traps','Shoulders','Biceps','Triceps','Forearms','Abs','Lower Back','Quads','Hamstrings','Glutes','Calves'],
+EQ=['Barbell','Dumbbell','Machine','Cable','Bodyweight','Band','Kettlebell','Other'],
+TY={wr:'Weight and reps',bw:'Bodyweight reps',wbw:'Weighted bodyweight',abw:'Assisted bodyweight',dur:'Duration'},
+SEED=`Bench Press (Barbell)|Chest|Triceps,Shoulders|Barbell|wr;Incline Dumbbell Press|Chest|Shoulders,Triceps|Dumbbell|wr;Overhead Press (Barbell)|Shoulders|Triceps|Barbell|wr;Lateral Raise (Dumbbell)|Shoulders||Dumbbell|wr;Squat (Barbell)|Quads|Glutes,Hamstrings|Barbell|wr;Deadlift (Barbell)|Hamstrings|Glutes,Lower Back,Traps|Barbell|wr;Romanian Deadlift|Hamstrings|Glutes,Lower Back|Barbell|wr;Leg Press|Quads|Glutes|Machine|wr;Leg Curl|Hamstrings||Machine|wr;Calf Raise|Calves||Machine|wr;Bent Over Row (Barbell)|Lats|Biceps,Traps|Barbell|wr;Lat Pulldown|Lats|Biceps|Cable|wr;Seated Cable Row|Lats|Biceps,Traps|Cable|wr;Bicep Curl (Dumbbell)|Biceps|Forearms|Dumbbell|wr;Triceps Pushdown|Triceps||Cable|wr;Hip Thrust (Barbell)|Glutes|Hamstrings|Barbell|wr;Pull Up|Lats|Biceps,Forearms|Bodyweight|bw;Chin Up|Biceps|Lats|Bodyweight|bw;Push Up|Chest|Triceps,Shoulders|Bodyweight|bw;Dip|Triceps|Chest,Shoulders|Bodyweight|bw;Muscle Up|Lats|Triceps,Chest,Biceps|Bodyweight|bw;Pike Push Up|Shoulders|Triceps|Bodyweight|bw;Pistol Squat|Quads|Glutes|Bodyweight|bw;Bodyweight Squat|Quads|Glutes|Bodyweight|bw;Lunge|Quads|Glutes,Hamstrings|Bodyweight|bw;Inverted Row|Lats|Biceps,Traps|Bodyweight|bw;Hanging Leg Raise|Abs|Forearms|Bodyweight|bw;Back Extension|Lower Back|Glutes,Hamstrings|Bodyweight|bw;Weighted Pull Up|Lats|Biceps,Forearms|Bodyweight|wbw;Weighted Dip|Triceps|Chest,Shoulders|Bodyweight|wbw;Assisted Pull Up|Lats|Biceps|Band|abw;Assisted Dip|Triceps|Chest,Shoulders|Band|abw;Plank|Abs|Shoulders|Bodyweight|dur;Hollow Hold|Abs||Bodyweight|dur;L-Sit|Abs|Triceps|Bodyweight|dur;Dead Hang|Forearms|Lats|Bodyweight|dur;Handstand Hold|Shoulders|Triceps|Bodyweight|dur;Front Lever Hold|Lats|Abs|Bodyweight|dur`;
+const $=s=>document.querySelector(s),save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}},
+esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+function init(){return{ex:SEED.split(';').map((l,i)=>{const[n,p,s,e,t]=l.split('|');return{id:'s'+i,name:n,p:p.split(','),s:s?s.split(','):[],eq:e,type:t}}),routines:[],workouts:[],bw:0,rest:90,active:null}}
+let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}S=S||init();
+const ex=id=>S.ex.find(e=>e.id==id)||{name:'(deleted exercise)',type:'wr',p:[],s:[]};
+let tab='workout',picking=0,q='',cx=null,rest=0;
+const T=t=>{tab=t;picking=0;cx=null;render()};
+function render(){save();const m={history:H,workout:W,exercises:E,profile:P};$('#v').innerHTML=(picking?E:m[tab])();
+document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab));fill()}
+const vol=w=>w.items.reduce((a,it)=>{const t=ex(it.ex).type;return a+it.sets.reduce((b,s)=>s.t=='W'||!s.reps?b:b+(t=='wr'?(+s.kg||0):t=='bw'?S.bw:t=='wbw'?S.bw+(+s.kg||0):0)*s.reps,0)},0);
+function prev(id){const w=S.workouts.find(w=>w.items.some(x=>x.ex==id));if(!w)return[];return w.items.find(x=>x.ex==id).sets.map(s=>(s.kg?s.kg+'×':'')+(s.reps||(s.sec?s.sec+'s':'')))}
+// Workout tab
+function W(){const a=S.active;
+if(!a)return`<h1>Workout</h1><button class=big onclick="S.active={name:'Workout',start:Date.now(),items:[]};render()">Start empty workout</button><h2>My routines</h2>`+(S.routines.map((r,i)=>`<div class=card><div class=row><b>${esc(r.name)}</b><span><button onclick="startR(${i})">Start</button> <button class="g red" onclick="if(confirm('Delete routine?')){S.routines.splice(${i},1);render()}">✕</button></span></div><div class=mu>${r.items.map(x=>esc(ex(x.ex).name)).join(', ')}</div></div>`).join('')||'<div class=mu>No routines yet. Finish setting up a workout, then tap Save routine.</div>');
+return`<div class=row><input class=note style="font-size:20px;font-weight:600" value="${esc(a.name)}" onchange="S.active.name=this.value;save()"><b id=tm class=mu>0:00</b></div>
+<div class=row style="margin-bottom:10px"><button class=g onclick="saveR()">Save routine</button><button class=g onclick="if(confirm('Discard workout?')){S.active=null;rest=0;render()}">Discard</button><button onclick="fin()">Finish</button></div>`+
+a.items.map((it,i)=>{const e=ex(it.ex),t=e.type,pv=prev(it.ex);let n=0;
+return`<div class="card ${it.ss||(a.items[i-1]&&a.items[i-1].ss)?'ss':''}"><div class=row><b>${esc(e.name)}</b><span><button class=g onclick="S.active.items[${i}].ss=!S.active.items[${i}].ss;render()">${it.ss?'Unlink':'Superset ↓'}</button> <button class=g onclick="S.active.items.splice(${i},1);render()">✕</button></span></div>
+<input class=note placeholder="Notes" value="${esc(it.note)}" onchange="S.active.items[${i}].note=this.value;save()">`+
+it.sets.map((s,j)=>{if(s.t=='N')n++;const f=(k,v)=>`<input type=number inputmode=decimal placeholder="${k}" value="${v??''}" onchange="up(${i},${j},'${k}',this.value)">`;
+return`<div class="set ${s.done?'done':''}"><button class="ty ${s.t}" onclick="cyc(${i},${j})">${s.t=='N'?n:s.t}</button><span class=pv>${pv[j]||'–'}</span>${t=='wr'||t=='wbw'?f('kg',s.kg):''}${t=='dur'?f('sec',s.sec):f('reps',s.reps)}<select onchange="up(${i},${j},'band',this.value)"><option value="">Band</option>${BANDS.map(b=>`<option ${s.band==b?'selected':''}>${b}</option>`).join('')}</select><button class=ck onclick="dn(${i},${j})">✓</button></div>`}).join('')+
+`<button class=g onclick="S.active.items[${i}].sets.push({t:'N'});render()">+ Add set</button></div>`}).join('')+
+`<button class=big onclick="picking=1;q='';render()">+ Add exercise</button>`}
+function up(i,j,k,v){S.active.items[i].sets[j][k]=k=='band'?v:(v===''?'':+v);save()}
+function cyc(i,j){const s=S.active.items[i].sets[j];s.t={N:'W',W:'D',D:'F',F:'N'}[s.t];render()}
+function dn(i,j){const s=S.active.items[i].sets[j];s.done=!s.done;if(s.done)rest=Date.now()+S.rest*1000;render()}
+function startR(i){const r=S.routines[i];S.active={name:r.name,start:Date.now(),items:r.items.map(x=>({ex:x.ex,ss:x.ss,sets:x.sets.map(s=>({t:s.t}))}))};render()}
+function saveR(){const a=S.active;if(!a.items.length)return alert('Add an exercise first.');const n=prompt('Routine name',a.name);if(!n)return;S.routines.push({name:n,items:a.items.map(x=>({ex:x.ex,ss:x.ss,sets:x.sets.map(s=>({t:s.t}))}))});save();alert('Routine saved.')}
+function fin(){const a=S.active,items=a.items.map(x=>({...x,sets:x.sets.filter(s=>s.done)})).filter(x=>x.sets.length);
+if(!items.length){if(!confirm('No completed sets. Discard workout?'))return}else S.workouts.unshift({id:Date.now(),name:a.name,start:a.start,end:Date.now(),items});S.active=null;rest=0;render()}
+// Exercises
+function E(){if(cx)return CF();return`<h1>${picking?'Add exercise':'Exercises'}</h1><input class=search placeholder="Search name, muscle or equipment" value="${esc(q)}" oninput="q=this.value;fill()"><button class=big onclick="cx={name:'',p:[],s:[],eq:'Barbell',type:'wr'};render()">+ Custom exercise</button><div id=lst></div>${picking?'<button class=g onclick="picking=0;render()">Cancel</button>':''}`}
+function fill(){const l=$('#lst');if(!l)return;const k=q.toLowerCase();l.innerHTML=S.ex.filter(e=>(e.name+e.p+e.s+e.eq).toLowerCase().includes(k)).sort((a,b)=>a.name.localeCompare(b.name)).map(e=>`<div class=card onclick="pk('${e.id}')"><div class=row><b>${esc(e.name)}</b>${e.custom&&!picking?`<button class="g red" onclick="event.stopPropagation();delE('${e.id}')">✕</button>`:''}</div><div class=mu>${e.p.join(', ')}${e.s.length?' (also '+e.s.join(', ')+')':''}, ${e.eq}, ${TY[e.type]}</div></div>`).join('')||'<div class=mu>No matches.</div>'}
+function pk(id){if(!picking)return;S.active.items.push({ex:id,sets:[{t:'N'}]});picking=0;render()}
+function delE(id){if(confirm('Delete this custom exercise?')){S.ex=S.ex.filter(e=>e.id!=id);render()}}
+function CF(){const ch=k=>MU.map(m=>`<span class="chip ${cx[k].includes(m)?'on':''}" onclick="tg('${k}','${m}')">${m}</span>`).join('');
+return`<h1>New exercise</h1><input class=search placeholder="Name" value="${esc(cx.name)}" oninput="cx.name=this.value"><h2>Primary muscles</h2>${ch('p')}<h2>Secondary muscles</h2>${ch('s')}<h2>Equipment</h2><select class=search onchange="cx.eq=this.value">${EQ.map(e=>`<option ${cx.eq==e?'selected':''}>${e}</option>`).join('')}</select><h2>Type</h2><select class=search onchange="cx.type=this.value">${Object.entries(TY).map(([k,v])=>`<option value=${k} ${cx.type==k?'selected':''}>${v}</option>`).join('')}</select><button class=big onclick="addC()">Save exercise</button><button class="g" onclick="cx=null;render()">Cancel</button>`}
+function tg(k,m){const a=cx[k];a.includes(m)?a.splice(a.indexOf(m),1):a.push(m);render()}
+function addC(){if(!cx.name.trim()||!cx.p.length)return alert('Enter a name and at least one primary muscle.');S.ex.push({id:'c'+Date.now(),name:cx.name.trim(),p:cx.p,s:cx.s.filter(m=>!cx.p.includes(m)),eq:cx.eq,type:cx.type,custom:1});cx=null;render()}
+// History
+function H(){return`<h1>History</h1>`+(S.workouts.map((w,i)=>`<div class=card><div class=row><b>${esc(w.name)}</b><button class="g red" onclick="if(confirm('Delete workout?')){S.workouts.splice(${i},1);render()}">✕</button></div><div class=mu>${new Date(w.start).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'})}, ${Math.round((w.end-w.start)/60000)} min, ${Math.round(vol(w)).toLocaleString()} kg volume</div>${w.items.map(it=>`<div style="margin-top:8px"><b style="font-size:14px">${esc(ex(it.ex).name)}</b><div class=mu>${it.sets.map(s=>(s.t!='N'?s.t+' ':'')+(s.kg?s.kg+'kg×':'')+(s.reps||(s.sec?s.sec+'s':''))+(s.band?' ('+s.band+')':'')).join(' · ')}</div>${it.note?`<div class=mu><i>${esc(it.note)}</i></div>`:''}</div>`).join('')}</div>`).join('')||'<div class=mu>No workouts yet. Finish one and it shows up here.</div>')}
+// Profile
+function P(){return`<h1>Profile</h1><h2>Bodyweight (kg), used for bodyweight exercise volume</h2><input class=search type=number inputmode=decimal value="${S.bw||''}" onchange="S.bw=+this.value||0;save()"><h2>Rest timer (seconds)</h2><input class=search type=number inputmode=numeric value="${S.rest}" onchange="S.rest=+this.value||90;save()"><h2>Backup</h2><button class=big onclick="exp()">Export backup</button><label class="g" style="display:block;text-align:center;padding:14px;border-radius:10px;background:#222b37">Import backup<input type=file accept=".json" style="display:none" onchange="imp(this.files[0])"></label>`}
+function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='lift-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()}
+function imp(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.ex||!d.workouts)throw 0;if(confirm('Replace all current data with this backup?')){S=d;render()}}catch(e){alert('That file is not a valid Lift backup.')}};r.readAsText(f)}
+setInterval(()=>{const a=S.active;if(a&&$('#tm'))$('#tm').textContent=fmt((Date.now()-a.start)/1000);const r=$('#rest'),l=Math.ceil((rest-Date.now())/1000);r.style.display=l>0&&S.active?'flex':'none';if(l>0)r.firstChild.textContent='Rest '+fmt(l)},500);
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+render();
+</script></body></html>
